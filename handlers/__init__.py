@@ -1,8 +1,7 @@
 from . import errors
-from . import users
+from .users import dp
 from . import groups
 from . import channels
-from .users import dp
 
 
 __all__ = ["dp"]
