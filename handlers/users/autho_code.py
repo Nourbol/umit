@@ -20,12 +20,11 @@ async def check_code(call: CallbackQuery):
 @dp.message_handler(state=CheckingCode.code)
 async def code_input(message: Message, state: FSMContext):
     code = message.text
-    if not post_code(code) is None:
-        USERS.append(User(message.from_user.id, post_code(code)))
+    token = post_code(code)
+    if not token is None:
+        USERS.append(User(message.from_user.id, token))
         await message.answer(f"Вы успешно прошли авторизацию!")
     else:
         await message.answer(f"Вы ввели неправильный код! Попробуйте раз!")
 
     await state.finish()
-
-
