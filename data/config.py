@@ -7,4 +7,10 @@ env.read_env()
 BOT_TOKEN = env.str("BOT_TOKEN")  # Забираем значение типа str
 ADMINS = env.list("ADMINS")  # Тут у нас будет список из админов
 IP = env.str("ip")  # Тоже str, но для айпи адреса хоста
+USERS = []
 
+
+class User(object):
+    def __init__(self, user_id, token):
+        self.user_id = user_id
+        self.token = token
