@@ -27,7 +27,7 @@ def get_user(token):
 
 
 def get_nearest(token, longitude, latitude):
-    url = f"http://bazarjok-group.com:60000/spots/nearest/Longitude={longitude}&Latitude={latitude}"
+    url = f"http://bazarjok-group.com:60000/spots/nearest?Longitude={longitude}&Latitude={latitude}"
     response = requests.get(url, headers={'Authorization': "Bearer " + token})
     if response.status_code == 200:
         return json.loads(response.text)
