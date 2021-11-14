@@ -1,9 +1,10 @@
+import requests
 from aiogram import types
-from aiogram.dispatcher.filters import Command
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, InputMediaPhoto
+from requests.exceptions import MissingSchema
 
-from apirequests import get_avatar, get_user
-from data.config import User, USERS
+from apirequests import get_user
+from data.config import USERS
 from keyboards.inline.menu_buttons import menu_kb, get_location_kb
 from loader import dp, bot
 
@@ -33,21 +34,26 @@ async def show_profile(call: CallbackQuery):
            f"Никнейм: {user_info['username']}\n" \
            f"Статус: {user_info['status']}"
 
-    if not user_info['avatarUrl'] is None:
-        await bot.send_photo(call.message.chat.id, user_info['avatarUrl'])
-    await call.message.answer(text)  # Прикрепи две инлайн кнопки: "Выйти из аккаунта" и "Сменить свой аватар"
+    urls = []
+    for url in user_info['images']:
+        try:
+            requests.get(url)
+            media = InputMediaPhoto(url)
+            urls.append(media)
+        except MissingSchema:
+            pass
+        except requests.ConnectionError:
+            pass
+    if len(urls) > 0:
+        await bot.send_media_group(call.message.chat.id, urls)
+    await bot.send_message(call.message.chat.id, text)
+    # Прикрепи две инлайн кнопки: "Выйти из аккаунта" и "Сменить свой аватар"
 
 
 @dp.callback_query_handler(text="nearest_point")
 async def ask_location(call: CallbackQuery):
     await call.message.answer("Поделитесь своим местоположением!", reply_markup=get_location_kb())
 
-
-@dp.message_handler(content_types=['location'])
-async def show_points_nearby(message: types.Message):
-    lat = message.location.latitude
-    lon = message.location.longitude
-    user = find_user(message.from_user.id)
 
 # Сделай так, чтобы при нажатии инлайн-кнопки "Мои комментарии", бот отвечал сообщением (см. схему Влада) и прикрепи
 # нужные инлайн-кнопки

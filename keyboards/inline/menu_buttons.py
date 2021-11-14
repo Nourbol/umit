@@ -5,7 +5,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def menu_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Точки поблизости", callback_data="nearest_point")
+            InlineKeyboardButton(text="Точка поблизости", callback_data="nearest_point")
         ],
         [
             InlineKeyboardButton(text="Мои комментарии", callback_data="my_comments")
