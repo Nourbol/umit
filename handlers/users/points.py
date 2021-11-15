@@ -6,20 +6,8 @@ from requests.exceptions import MissingSchema
 
 from apirequests import get_nearest
 from handlers.users.menu import find_user
+from keyboards.inline.spot import comments_kb
 from loader import dp, bot
-
-spot_kb_cb: CallbackData = CallbackData("spot_kb_cb", "action", "spot_id")
-
-
-def comments_kb(spot_id):
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Show comments", callback_data=spot_kb_cb.new("show_comments", spot_id))
-        ],
-        [
-            InlineKeyboardButton(text="Add comment", callback_data=spot_kb_cb.new("add_comment", spot_id))
-        ]
-    ])
 
 
 @dp.message_handler(content_types=['location'])

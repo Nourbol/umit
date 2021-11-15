@@ -33,17 +33,16 @@ async def show_profile(call: CallbackQuery):
     text = f"Email: {user_info['email']}\n" \
            f"Никнейм: {user_info['username']}\n" \
            f"Статус: {user_info['status']}"
-
     urls = []
-    for url in user_info['images']:
-        try:
-            requests.get(url)
-            media = InputMediaPhoto(url)
-            urls.append(media)
-        except MissingSchema:
-            pass
-        except requests.ConnectionError:
-            pass
+    try:
+        url = user_info['avatarUrl']
+        requests.get(url)
+        media = InputMediaPhoto(url)
+        urls.append(media)
+    except MissingSchema:
+        pass
+    except requests.ConnectionError:
+        pass
     if len(urls) > 0:
         await bot.send_media_group(call.message.chat.id, urls)
     await bot.send_message(call.message.chat.id, text)
@@ -53,7 +52,6 @@ async def show_profile(call: CallbackQuery):
 @dp.callback_query_handler(text="nearest_point")
 async def ask_location(call: CallbackQuery):
     await call.message.answer("Поделитесь своим местоположением!", reply_markup=get_location_kb())
-
 
 # Сделай так, чтобы при нажатии инлайн-кнопки "Мои комментарии", бот отвечал сообщением (см. схему Влада) и прикрепи
 # нужные инлайн-кнопки
