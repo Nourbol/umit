@@ -14,6 +14,7 @@ from loader import dp, bot
 async def show_points_nearby(message: types.Message):
     lat = message.location.latitude
     lon = message.location.longitude
+
     user = find_user(message.from_user.id)
     point = get_nearest(user.token, lon, lat)
     text = f"Адрес: {point['title']}\n" \

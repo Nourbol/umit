@@ -4,9 +4,9 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from requests.exceptions import MissingSchema
 
-from apirequests import get_comments, get_copy_of_comments
+from apirequests import get_comments
 from handlers.users.menu import find_user
-from keyboards.inline.comments import show_comments_kb, author_like_kb
+from keyboards.inline.comments import show_comments_kb, author_like_kb, author_like_kb_cb
 from keyboards.inline.spot import spot_kb_cb
 from loader import dp, bot
 
@@ -15,7 +15,7 @@ class ShowingComments(StatesGroup):
     comments = State()
 
 
-async def show_n_comments(n, message: Message, state: FSMContext, spot_id):
+async def show_n_comments(n, message: Message, state: FSMContext):
     comments: [] = (await state.get_data())["comments"]
     if len(comments) < n:
         n = len(comments)
@@ -24,10 +24,15 @@ async def show_n_comments(n, message: Message, state: FSMContext, spot_id):
         text = f"{comments[i]['text']}\n\n" \
                f"Комментарий был оставлен: {comments[i]['creationDate']}"
 
-        await message.answer(text, reply_markup=author_like_kb(comments[i]['id'], spot_id))
+        await message.answer(text, reply_markup=author_like_kb(comments[i]['id']))
 
     comments = comments[n:]
     await state.update_data(comments=comments)
+
+
+@dp.callback_query_handler(author_like_kb_cb.filter(action="like"), state=ShowingComments.comments)
+async def like_comment(call: CallbackQuery, state: FSMContext, callback_data: dict):
+    await call.message.answer(f"{(await state.get_data())['spot_id']} {callback_data['comment_id']}")
 
 
 @dp.callback_query_handler(spot_kb_cb.filter(action='show_comments'))
@@ -36,13 +41,15 @@ async def show_comments(call: CallbackQuery, state: FSMContext, callback_data: d
     await ShowingComments.comments.set()
     comments = get_comments(user.token, callback_data['spot_id'])
     await state.update_data(comments=comments)
-    await show_n_comments(3, call.message, state, callback_data['spot_id'])
-    if len(comments) >= 3:
-        await call.message.answer("Вы можете заргузить еще комментарии", reply_markup=show_comments_kb())
-    else:
-        await show_n_comments(len(comments), call.message, state, callback_data['spot_id'])
+    await state.update_data(spot_id=callback_data['spot_id'])
 
-    await state.finish()
+    await show_n_comments(3, call.message, state)
+    if len(comments) >= 3:
+        await call.message.answer("Вы можете заргузить еще комментарии",
+                                  reply_markup=show_comments_kb(callback_data['spot_id']))
+    else:
+        await show_n_comments(len(comments), call.message, state)
+
 
 
 def find_comment(user_id, comment_id, spot_id):

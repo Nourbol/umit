@@ -4,8 +4,8 @@ from aiogram.types import CallbackQuery, Message
 
 from apirequests import send_comment
 from handlers.users.menu import find_user
-from handlers.users.points import spot_kb_cb
 from keyboards.inline.menu_buttons import get_location_kb
+from keyboards.inline.spot import spot_kb_cb
 from loader import dp
 
 
@@ -35,3 +35,4 @@ async def coord_comment_handler(message: Message, state: FSMContext):
     user = find_user(message.from_user.id)
     send_comment(user.token, data["spot_id"], data["text"], message.location.longitude, message.location.latitude)
     await state.finish()
+    await message.answer("Вы добавили комментарий")

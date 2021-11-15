@@ -3,7 +3,6 @@ import logging
 from aiogram import types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
-from keyboards.inline.your_comments import your_comments_keybord
 from loader import dp
 
 
