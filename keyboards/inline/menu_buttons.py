@@ -1,5 +1,10 @@
+import logging
+
 from aiogram import types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+
+from keyboards.inline.your_comments import your_comments_keybord
+from loader import dp
 
 
 def menu_kb():
@@ -21,3 +26,12 @@ def get_location_kb():
     button = types.KeyboardButton("Share Position", request_location=True)
     keyboard.add(button)
     return keyboard
+
+
+@dp.callback_query_handler(text_contains="my_comments")
+async def show_my_comments(call: CallbackQuery):
+    await call.answer(cache_time=10)
+    callback_data = call.data
+    logging.info(f"call={callback_data}")
+    await call.message.answer(f"Ваши комментарии:",
+                              reply_markup=your_comments_keybord)

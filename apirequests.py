@@ -42,9 +42,22 @@ def get_comments(token, spot_id):
     return None
 
 
-def get_copy_of_comments(token, spot_id):
+def send_comment(token, spot_id, text, longitude, latitude):
+    body = {
+        "text": text,
+        "longitude": longitude,
+        "latitude": latitude
+    }
+
     url = f"http://bazarjok-group.com:60000/api/spots/{spot_id}/comments"
-    response = requests.get(url, headers={'Authorization': "Bearer " + token})
+    response = requests.post(url, data=json.dumps(body, ensure_ascii=False)
+                             .encode('utf-8'), headers=
+                             {
+                                 'Authorization': "Bearer " + token,
+                                 "Content-Type": "application/json"
+                             })
     if response.status_code == 200:
-        return json.loads(response.text)
-    return None
+        return 'ok'
+    else:
+        return response.text
+
