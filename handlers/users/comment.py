@@ -71,7 +71,7 @@ async def show_more_comments(call: CallbackQuery, state: FSMContext, callback_da
         await show_n_comments(len((await state.get_data())["comments"]), call.message, state)
 
 
-@dp.message_handler(commands=['stop'])
+@dp.message_handler(commands=['stop'], state=ShowingComments)
 async def stop_showing_comments(message: Message, state: FSMContext):
     await message.answer(f"Вы прекратили просмотр комментариев")
 

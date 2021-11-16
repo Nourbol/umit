@@ -21,7 +21,7 @@ async def show_menu(message: types.Message):
     if find_user(message.from_user.id) is None:
         return
 
-    await message.answer(f"Вот наше меню",
+    await message.answer(f"Выберите действие👾",
                          reply_markup=menu_kb())
 
 
@@ -51,7 +51,7 @@ async def show_profile(call: CallbackQuery):
 
 @dp.callback_query_handler(text="nearest_point")
 async def ask_location(call: CallbackQuery):
-    await call.message.answer("Поделитесь своим местоположением!", reply_markup=get_location_kb())
+    await call.message.answer("Поделитесь своим местоположением✈️!", reply_markup=get_location_kb())
 
 # Сделай так, чтобы при нажатии инлайн-кнопки "Мои комментарии", бот отвечал сообщением (см. схему Влада) и прикрепи
 # нужные инлайн-кнопки
