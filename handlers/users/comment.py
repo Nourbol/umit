@@ -38,7 +38,7 @@ async def like_comment(call: CallbackQuery, state: FSMContext, callback_data: di
     user = find_user(call.from_user.id)
     like = post_likes(user.token, (await state.get_data())['spot_id'], callback_data['comment_id'])
     if not like is None:
-        await call.message.answer(f"Лайк поставлен!")
+        await call.message.answer(f"Лайк поставлен ❣️")
     else:
         await call.message.answer(f"Нельзя поставить лайк более одного раза!")
 
@@ -53,7 +53,7 @@ async def show_comments(call: CallbackQuery, state: FSMContext, callback_data: d
 
     await show_n_comments(3, call.message, state)
     if len(comments) >= 3:
-        await call.message.answer("Вы можете заргузить еще комментарии\n"
+        await call.message.answer("Вы можете заргузить еще комментарии 👾\n"
                                   "Если хотите прекратить просмотр комментарий, нажмите на /stop ",
                                   reply_markup=show_comments_kb(callback_data['spot_id']))
     else:
@@ -65,7 +65,7 @@ async def show_more_comments(call: CallbackQuery, state: FSMContext, callback_da
     user = find_user(call.from_user.id)
     await show_n_comments(3, call.message, state)
     if len((await state.get_data())["comments"]) >= 3:
-        await call.message.answer("Вы можете заргузить еще комментарии",
+        await call.message.answer("Вы можете заргузить еще комментарии 👾",
                                   reply_markup=show_comments_kb(callback_data['spot_id']))
     else:
         await show_n_comments(len((await state.get_data())["comments"]), call.message, state)

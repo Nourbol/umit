@@ -32,7 +32,7 @@ async def show_my_comments(call: CallbackQuery):
     await call.answer(cache_time=10)
     callback_data = call.data
     logging.info(f"call={callback_data}")
-    await call.message.answer(f"🔹Ваши комментарии:",
+    await call.message.answer(f"▫️Ваши комментарии:",
                               reply_markup=your_comments_keybord)
 
 # я немного не поняла как будут высвечиваться старые комментарии пользователей, завтра разберусь и закончу

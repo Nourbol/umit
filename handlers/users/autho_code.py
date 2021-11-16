@@ -23,9 +23,9 @@ async def code_input(message: Message, state: FSMContext):
     token = post_code(code)
     if not token is None:
         USERS.append(User(message.from_user.id, token))
-        await message.answer(f"✔️ Вы успешно прошли авторизацию!\n"
+        await message.answer(f"☑️ Вы успешно прошли авторизацию!\n"
                              f"Для дальнейших дейсвий можете использовать команду /menu 👾")
     else:
-        await message.answer(f"✖️ Вы ввели неправильный код! Попробуйте раз!")
+        await message.answer(f"🔘 Вы ввели неправильный код! Попробуйте раз!")
 
     await state.finish()

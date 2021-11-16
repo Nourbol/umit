@@ -26,7 +26,7 @@ async def text_comment_handler(message: Message, state: FSMContext):
     await CommentAddState.coords.set()
     await state.update_data(text=message.text)
     await message.answer("Отлично! Теперь нужно отправить свою геопозици, чтобы подтвердить, "
-                         "что Вы действительно находитесь на локации", reply_markup=get_location_kb())
+                         "что вы действительно находитесь на локации 👾", reply_markup=get_location_kb())
 
 
 @dp.message_handler(content_types=['location'], state=CommentAddState.coords)
