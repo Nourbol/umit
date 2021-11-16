@@ -1,14 +1,12 @@
-import requests
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto
-from requests.exceptions import MissingSchema
+from aiogram.types import CallbackQuery, Message
 
 from apirequests import get_comments, post_likes
 from handlers.users.menu import find_user
 from keyboards.inline.comments import show_comments_kb, author_like_kb, author_like_kb_cb
 from keyboards.inline.spot import spot_kb_cb
-from loader import dp, bot
+from loader import dp
 
 
 class ShowingComments(StatesGroup):
