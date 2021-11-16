@@ -1,7 +1,8 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, ParseMode
 
+from aiogram.utils.markdown import bold
 from apirequests import post_code
 from data.config import USERS, User
 from loader import dp
@@ -23,9 +24,10 @@ async def code_input(message: Message, state: FSMContext):
     token = post_code(code)
     if not token is None:
         USERS.append(User(message.from_user.id, token))
-        await message.answer(f"☑️ Вы успешно прошли авторизацию!\n"
-                             f"Для дальнейших дейсвий можете использовать команду /menu 👾")
+        await message.answer(f"☑️ {bold('Вы успешно прошли авторизацию')}!\n"
+                             f"Для дальнейших действий — можете воспользоваться командой /menu 👾", parse_mode=ParseMode.MARKDOWN)
     else:
-        await message.answer(f"🔘 Вы ввели неправильный код! Попробуйте раз!")
+        await message.answer(f"🔘 Вы ввели {bold('неправильный')} код!\n"
+                             f"Чтобы повторно ввести код — нажмите на \"{bold('У меня есть код')}\"", parse_mode=ParseMode.MARKDOWN)
 
     await state.finish()

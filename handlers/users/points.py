@@ -1,7 +1,6 @@
 import requests
 from aiogram import types
-from aiogram.types import InputMediaPhoto, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.callback_data import CallbackData
+from aiogram.types import InputMediaPhoto, ReplyKeyboardRemove
 from requests.exceptions import MissingSchema
 
 from apirequests import get_nearest
@@ -20,16 +19,23 @@ async def show_points_nearby(message: types.Message):
     text = f"Адрес: {point['title']}\n" \
            f"Детали: {point['details']}"
 
-    urls = []
-    for url in point['images']:
-        try:
-            requests.get(url)
-            media = InputMediaPhoto(url)
-            urls.append(media)
-        except MissingSchema:
-            pass
-        except requests.ConnectionError:
-            pass
-    if len(urls) > 0:
+    await message.answer(f"Мы успешно обработали вашу геолокацию!", reply_markup=ReplyKeyboardRemove())
+
+    if len(point['images']) > 1:
+
+        urls = []
+        for url in point['images']:
+            try:
+                requests.get(url)
+                media = InputMediaPhoto(url)
+                urls.append(media)
+            except MissingSchema:
+                pass
+            except requests.ConnectionError:
+                pass
         await bot.send_media_group(message.chat.id, urls)
+    elif len(point['images']) == 1:
+        url = point['images'][0]
+        await bot.send_photo(message.chat.id, url)
+
     await bot.send_message(message.chat.id, text, reply_markup=comments_kb(point['id']))

@@ -1,6 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 
 from apirequests import send_comment
 from handlers.users.menu import find_user
@@ -35,4 +35,4 @@ async def coord_comment_handler(message: Message, state: FSMContext):
     user = find_user(message.from_user.id)
     send_comment(user.token, data["spot_id"], data["text"], message.location.longitude, message.location.latitude)
     await state.finish()
-    await message.answer("Вы добавили комментарий")
+    await message.answer("Вы добавили комментарий", reply_markup=ReplyKeyboardRemove())

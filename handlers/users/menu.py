@@ -4,7 +4,7 @@ import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
-from aiogram.types import CallbackQuery, InputMediaPhoto, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 from requests.exceptions import MissingSchema
 
@@ -30,7 +30,7 @@ async def show_menu(message: types.Message, state: FSMContext):
     if find_user(message.from_user.id) is None:
         return
 
-    await message.answer(f"Выберите действие👾",
+    await message.answer(f"Выберите действие 👾",
                          reply_markup=menu_kb())
 
 
@@ -41,15 +41,18 @@ async def my_comments_handler(call: CallbackQuery):
         return
     comments = apirequests.get_users_comments(user.token)
 
-    text = "Ваши комментарии:\n"
-    for comment in comments:
-        comment_name = comment["text"][:35] + '...' if len(comment["text"]) > 35 else comment["text"]
-        text += f"{comment_name}\n" \
-                f"Комментарий понравился {comment['likes']} людям\n" \
-                f"Комментарий был оставлен: {comment['creationDate']}\n" \
-                f"\n\n\n"
+    if not len(comments) == 0:
+        text = "Ваши комментарии:\n"
+        for comment in comments:
+            comment_name = comment["text"][:35] + '...' if len(comment["text"]) > 35 else comment["text"]
+            text += f"{comment_name}\n" \
+                    f"Комментарий понравился {comment['likes']} людям\n" \
+                    f"Комментарий был оставлен: {comment['creationDate']}\n" \
+                    f"\n\n\n"
+        await call.message.answer(text)
+    else:
+        await bot.answer_callback_query(call.id, f"Вы не написали ни одного комментария...", show_alert=True)
 
-    await call.message.answer(text)
 
 
 @dp.callback_query_handler(text="profile")
@@ -147,7 +150,7 @@ async def set_avatar(call: CallbackQuery, callback_data: dict, state: FSMContext
 
 @dp.callback_query_handler(text="nearest_point")
 async def ask_location(call: CallbackQuery):
-    await call.message.answer("Поделитесь своим местоположением✈️!", reply_markup=get_location_kb())
+    await call.message.answer("Поделитесь своим местоположением ✈️", reply_markup=get_location_kb())
 
 # Сделай так, чтобы при нажатии инлайн-кнопки "Мои комментарии", бот отвечал сообщением (см. схему Влада) и прикрепи
 # нужные инлайн-кнопки
