@@ -34,6 +34,24 @@ async def show_menu(message: types.Message, state: FSMContext):
                          reply_markup=menu_kb())
 
 
+@dp.callback_query_handler(text="my_comments", state="*")
+async def my_comments_handler(call: CallbackQuery):
+    user = find_user(call.from_user.id)
+    if user is None:
+        return
+    comments = apirequests.get_users_comments(user.token)
+
+    text = "Ваши комментарии:\n"
+    for comment in comments:
+        comment_name = comment["text"][:35] + '...' if len(comment["text"]) > 35 else comment["text"]
+        text += f"{comment_name}\n" \
+                f"Комментарий понравился {comment['likes']} людям\n" \
+                f"Комментарий был оставлен: {comment['creationDate']}\n" \
+                f"\n\n\n"
+
+    await call.message.answer(text)
+
+
 @dp.callback_query_handler(text="profile")
 async def show_profile(call: CallbackQuery):
     user = find_user(call.from_user.id)
