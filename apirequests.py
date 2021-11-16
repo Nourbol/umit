@@ -61,3 +61,10 @@ def send_comment(token, spot_id, text, longitude, latitude):
     else:
         return response.text
 
+
+def post_likes(token, spot_id, comment_id):
+    url = f"http://bazarjok-group.com:60000/spots/{spot_id}/comments/{comment_id}/likes"
+    response = requests.post(url, headers={'Authorization': "Bearer " + token})
+    if response.status_code == 204:
+        return "ok"
+    return None

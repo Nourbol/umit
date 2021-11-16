@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from requests.exceptions import MissingSchema
 
-from apirequests import get_comments
+from apirequests import get_comments, post_likes
 from handlers.users.menu import find_user
 from keyboards.inline.comments import show_comments_kb, author_like_kb, author_like_kb_cb
 from keyboards.inline.spot import spot_kb_cb
@@ -22,7 +22,10 @@ async def show_n_comments(n, message: Message, state: FSMContext):
 
     for i in range(n):
         text = f"{comments[i]['text']}\n\n" \
-               f"Комментарий был оставлен: {comments[i]['creationDate']}"
+               f"Комментарий понравился {comments[i]['likes']} людям\n" \
+               f"Комментарий был оставлен: {comments[i]['creationDate']}\n" \
+               f"Имя пользователя: {comments[i]['authorsUsername']}\n" \
+               f"Статус пользователя: {comments[i]['authorsStatus']}\n"
 
         await message.answer(text, reply_markup=author_like_kb(comments[i]['id']))
 
@@ -32,7 +35,12 @@ async def show_n_comments(n, message: Message, state: FSMContext):
 
 @dp.callback_query_handler(author_like_kb_cb.filter(action="like"), state=ShowingComments.comments)
 async def like_comment(call: CallbackQuery, state: FSMContext, callback_data: dict):
-    await call.message.answer(f"{(await state.get_data())['spot_id']} {callback_data['comment_id']}")
+    user = find_user(call.from_user.id)
+    like = post_likes(user.token, (await state.get_data())['spot_id'], callback_data['comment_id'])
+    if not like is None:
+        await call.message.answer(f"Лайк поставлен!")
+    else:
+        await call.message.answer(f"Нельзя поставить лайк более одного раза!")
 
 
 @dp.callback_query_handler(spot_kb_cb.filter(action='show_comments'))
@@ -45,46 +53,26 @@ async def show_comments(call: CallbackQuery, state: FSMContext, callback_data: d
 
     await show_n_comments(3, call.message, state)
     if len(comments) >= 3:
+        await call.message.answer("Вы можете заргузить еще комментарии\n"
+                                  "Если хотите прекратить просмотр комментарий, нажмите на /stop ",
+                                  reply_markup=show_comments_kb(callback_data['spot_id']))
+    else:
+        await call.message.answer(f"Если хотите прекратить просмотр комментарий, нажмите на /stop ")
+
+
+@dp.callback_query_handler(spot_kb_cb.filter(action='show_more_comments'))
+async def show_more_comments(call: CallbackQuery, state: FSMContext, callback_data: dict):
+    user = find_user(call.from_user.id)
+    await show_n_comments(3, call.message, state)
+    if len((await state.get_data())["comments"]) >= 3:
         await call.message.answer("Вы можете заргузить еще комментарии",
                                   reply_markup=show_comments_kb(callback_data['spot_id']))
     else:
-        await show_n_comments(len(comments), call.message, state)
+        await show_n_comments(len((await state.get_data())["comments"]), call.message, state)
 
 
+@dp.message_handler(commands=['stop'])
+async def stop_showing_comments(message: Message, state: FSMContext):
+    await message.answer(f"Вы прекратили просмотр комментариев")
 
-def find_comment(user_id, comment_id, spot_id):
-    comments = get_copy_of_comments(user_id, spot_id)
-    for key, comment in enumerate(comments):
-        if comment_id == comment['id']:
-            return comment
-
-
-@dp.callback_query_handler(spot_kb_cb.filter(action="show_author_profile"))
-async def show_author_profile(call: CallbackQuery, callback_data: dict):
-    comment = find_comment(call.message.from_user.id, callback_data['comment_id'], callback_data['spot_id'])
-    text = f"Имя пользователя: {comment['authorsUsername']}\n" \
-           f"Статус: {comment['authorsStatus']}"
-
-    urls = []
-    try:
-        url = comment['authorsAvatarUrl']
-        requests.get(url)
-        media = InputMediaPhoto(url)
-        urls.append(media)
-    except MissingSchema:
-        pass
-    except requests.ConnectionError:
-        pass
-    if len(urls) > 0:
-        await bot.send_media_group(call.message.chat.id, urls)
-    await bot.send_message(call.message.chat.id, text)
-
-
-class AddingComment(StatesGroup):
-    comment = State()
-
-
-@dp.callback_query_handler(text="add_comment")
-async def add_comments(call: CallbackQuery):
-    await AddingComment.comment.set()
-    await call.message.answer(f"Напишите свой комментарий и прикрепите фото этой точки!")
+    await state.finish()

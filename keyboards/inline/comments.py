@@ -7,7 +7,7 @@ from keyboards.inline.spot import spot_kb_cb
 def show_comments_kb(spot_id):
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Загрузить", callback_data=spot_kb_cb.new("show_comments", spot_id))
+            InlineKeyboardButton(text="Загрузить", callback_data=spot_kb_cb.new("show_more_comments", spot_id))
         ]
     ])
 
@@ -18,10 +18,6 @@ author_like_kb_cb: CallbackData = CallbackData("author_kb_cb", "action", "commen
 def author_like_kb(comment_id):
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="Показать профиль", callback_data=author_like_kb_cb.new("author_profile",
-                                                                                              comment_id))
-        ],
-        [
-            InlineKeyboardButton(text="Поставить лайк", callback_data=author_like_kb_cb.new("like", comment_id))
+            InlineKeyboardButton(text="Поставить лайк!", callback_data=author_like_kb_cb.new("like", comment_id))
         ]
     ])
